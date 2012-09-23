@@ -1,0 +1,152 @@
+/*
+ * -----------------------------------------------------------------------------
+ * Ogre License
+ *
+ * Original source file is part of OGRE (Object-oriented Graphics Rendering Engine)
+ * For the latest info, see <http://www.ogre3d.org/>
+ *
+ * Copyright (c) 2000-2012 Torus Knot Software Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * -----------------------------------------------------------------------------
+ * tolua++-bindings License
+ *
+ * This binding "package" is part of tolua++-bindings, a collection of Lua bindings
+ * for C++ applications generatable using tolua++. See <https://github.com/amireh/tolua++-bindings>
+ *
+ * Copyright (c) 2012 Ahmad Amireh <ahmad@amireh.net>
+ */
+
+$#include <OGRE/OgrePlatform.h>
+
+namespace Ogre {
+
+  enum BillboardOrigin
+  {
+    BBO_TOP_LEFT,
+    BBO_TOP_CENTER,
+    BBO_TOP_RIGHT,
+    BBO_CENTER_LEFT,
+    BBO_CENTER,
+    BBO_CENTER_RIGHT,
+    BBO_BOTTOM_LEFT,
+    BBO_BOTTOM_CENTER,
+    BBO_BOTTOM_RIGHT
+  };
+
+  /** The rotation type of billboard. */
+  enum BillboardRotationType
+  {
+    /// Rotate the billboard's vertices around their facing direction
+    BBR_VERTEX,
+    /// Rotate the billboard's texture coordinates
+    BBR_TEXCOORD
+  };
+  /** The type of billboard to use. */
+  enum BillboardType
+  {
+    /// Standard point billboard (default), always faces the camera completely and is always upright
+    BBT_POINT,
+    /// Billboards are oriented around a shared direction vector (used as Y axis) and only rotate around this to face the camera
+    BBT_ORIENTED_COMMON,
+    /// Billboards are oriented around their own direction vector (their own Y axis) and only rotate around this to face the camera
+    BBT_ORIENTED_SELF,
+    /// Billboards are perpendicular to a shared direction vector (used as Z axis, the facing direction) and X, Y axis are determined by a shared up-vertor
+    BBT_PERPENDICULAR_COMMON,
+    /// Billboards are perpendicular to their own direction vector (their own Z axis, the facing direction) and X, Y axis are determined by a shared up-vertor
+    BBT_PERPENDICULAR_SELF
+  };
+  class BillboardSet : public MovableObject, public Renderable {
+    public:
+    BillboardSet( const String& name, unsigned int poolSize = 20,
+    bool externalDataSource = false);
+    virtual ~BillboardSet();
+    Billboard* createBillboard(
+    const Vector3& position,
+    const ColourValue& colour = ColourValue::White );
+    Billboard* createBillboard(
+    Real x, Real y, Real z,
+    const ColourValue& colour = ColourValue::White );
+    virtual int getNumBillboards(void) const;
+    virtual void setAutoextend(bool autoextend);
+    virtual bool getAutoextend(void) const;
+		virtual void setSortingEnabled(bool sortenable);
+		virtual bool getSortingEnabled(void) const;
+    virtual void setPoolSize(size_t size);
+    virtual unsigned int getPoolSize(void) const;
+    virtual void clear();
+    virtual Billboard* getBillboard(unsigned int index) const;
+    virtual void removeBillboard(unsigned int index);
+    virtual void removeBillboard(Billboard* pBill);
+    virtual void setBillboardOrigin(BillboardOrigin origin);
+    virtual BillboardOrigin getBillboardOrigin(void) const;
+    virtual void setBillboardRotationType(BillboardRotationType rotationType);
+    virtual BillboardRotationType getBillboardRotationType(void) const;
+    virtual void setDefaultDimensions(Real width, Real height);
+    virtual void setDefaultWidth(Real width);
+    virtual Real getDefaultWidth(void) const;
+    virtual void setDefaultHeight(Real height);
+    virtual Real getDefaultHeight(void) const;
+    virtual void setMaterialName( const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+    virtual const String& getMaterialName(void) const;
+    virtual bool getCullIndividually(void) const;
+    virtual void setCullIndividually(bool cullIndividual);
+    virtual void setBillboardType(BillboardType bbt);
+    virtual BillboardType getBillboardType(void) const;
+    virtual void setCommonDirection(const Vector3& vec);
+    virtual const Vector3& getCommonDirection(void) const;
+    virtual void setCommonUpVector(const Vector3& vec);
+    virtual const Vector3& getCommonUpVector(void) const;
+    //virtual void setTextureCoords( FloatRect const * coords, uint16 numCoords );
+  };
+  class Billboard  {
+  public:
+    // Note the intentional public access to main internal variables used at runtime
+    // Forcing access via get/set would be too costly for 000's of billboards
+    Vector3 mPosition;
+    // Normalised direction vector
+    Vector3 mDirection;
+    BillboardSet* mParentSet;
+    ColourValue mColour;
+    Radian mRotation;
+    Billboard();
+    ~Billboard();
+    Billboard(const Vector3& position, BillboardSet* owner, const ColourValue& colour = ColourValue::White);
+    const Radian& getRotation(void) const;
+    void setRotation(const Radian& rotation);
+    void setPosition(const Vector3& position);
+    void setPosition(Real x, Real y, Real z);
+    const Vector3& getPosition(void) const;
+    void setDimensions(Real width, Real height);
+    void resetDimensions(void);
+    void setColour(const ColourValue& colour);
+    const ColourValue& getColour(void) const;
+    bool hasOwnDimensions(void) const;
+    Real getOwnWidth(void) const;
+    Real getOwnHeight(void) const;
+    void _notifyOwner(BillboardSet* owner);
+    bool isUseTexcoordRect(void) const;
+    void setTexcoordIndex(uint16 texcoordIndex);
+    uint16 getTexcoordIndex(void) const;
+    void setTexcoordRect(Real u0, Real v0, Real u1, Real v1);
+
+    //void setTexcoordRect(const FloatRect& texcoordRect);
+    //const FloatRect& getTexcoordRect(void) const;
+  };
+}
